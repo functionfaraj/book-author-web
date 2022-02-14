@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import config from '../config';
 
 axios.defaults.baseURL = config.api_server
-
 const useAxios = ({ url, method, data = null, headers = null }) => {
     const [response, setResponse] = useState(null);
     const [error, setError] = useState('');
@@ -25,7 +24,7 @@ const useAxios = ({ url, method, data = null, headers = null }) => {
             setloading(false);
             setError(err.message);
         }
-    };
+    }
 
     useEffect(() => {
         runAxios();
