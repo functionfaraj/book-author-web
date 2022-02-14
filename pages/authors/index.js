@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import styles from '../../styles/Home.module.scss'
-import { useBookList } from './useBookList'
 import Table from '../../component/table'
 import Pagination from '../../component/Pagination/Pagination'
 import CreateIcon from '@material-ui/icons/Create';
@@ -12,102 +11,88 @@ import { InputBase } from '@material-ui/core'
 import DropDownValue from '../../component/DropDownValue/DropDownValue'
 import { useAuthorList } from '../authors/useAuthorList'
 
-export default function Books() {
+export default function Authors() {
   const [page, setPage] = useState(1);
-  const { books, loading, totalPages, addBook, updateBook } = useBookList({ page, limit: 5 })
+  const { authors, loading, totalPages, addAuthor, updateAuthor } = useAuthorList({ page, limit: 5 })
   const router = useRouter()
   useEffect(() => {
     setPage(router.query.page || 1)
   }, [router.query.page])
   const columns = [
     {
-      title: "name",
-      field: "name"
+      title: "first_name",
+      field: "first_name"
     },
     {
-      title: "isbn",
-      field: "isbn"
-    },
-    {
-      title: 'author',
-      field: "author"
+      title: "last_name",
+      field: "last_name"
     },
     {
       title: 'update',
     },
   ];
-  const [bookName, setBookName] = useState('')
-  const [bookISBN, setBookISBN] = useState('')
-  const [bookAuthor, setBookAuthor] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [openModal, setopenModal] = useState(false)
   const [modalType, setModalType] = useState('add')
   const onCloseModal = () => {
     setopenModal(false)
-    setBookName('')
-    setBookISBN('')
-    setBookAuthor('')
+    setFirstName('')
+    setLastName('')
   }
-  const { authors } = useAuthorList({ limit: 100 })
   const onClickAddModal = () => {
     setModalType('add')
     setopenModal(true)
   }
   const onClicKSave = async () => {
-    const addResult = await addBook({ name: bookName, isbn: bookISBN, author: bookAuthor._id })
-    if (addResult?.data?.book) {
+    const addResult = await addAuthor({ first_name: firstName, last_name: lastName })
+    if (addResult?.data?.author) {
       onCloseModal()
     }
   }
-  const [selectedBook, setSelectedBook] = useState('')
-  const onClickUpdate = async (book) => {
-    setSelectedBook(book._id)
-    setBookName(book.name)
-    setBookISBN(book.isbn)
-    setBookAuthor(book.author)
+  const [selectedAuthor, setSelectedAuthor] = useState('')
+  const onClickUpdate = async (author) => {
+    setSelectedAuthor(author._id)
+    setLastName(author.last_name)
+    setFirstName(author.first_name)
     setModalType('update')
     setopenModal(true)
   }
   const onClickUpdateInModal = async () => {
-    const updateResult = await updateBook(selectedBook, { name: bookName, isbn: bookISBN, author: bookAuthor._id })
-    if (updateResult?.data?.book) {
+    const updateResult = await updateAuthor(selectedAuthor, { first_name: firstName, last_name: lastName })
+    if (updateResult?.data?.author) {
       onCloseModal()
     }
-  }
-
-  const onClickBook = (_id) => {
-    router.push('books/' + _id)
   }
   return (
     <div className={styles.container}>
       <Head>
-        <title>Books</title>
+        <title>Authors</title>
       </Head>
       <h1 className={styles.title}>
-        <a href="/">Home</a> - <a href="#">Books</a>
+        <a href="/">Home</a> - <a href="#">Authors</a>
       </h1>
 
       <AddBox className={`${styles.cursor_pointer}`} onClick={onClickAddModal} />
       <div>
         <Table
           headerRow={columns}
-          docs={books}
-          dataLength={books?.length}
+          docs={authors}
+          dataLength={authors?.length}
         >
           {
-            books?.length && books?.map((book) => {
+            authors?.length && authors?.map((author) => {
               return (
-                <tr key={book._id}>
-                  <td className={`${styles.cursor_pointer}`} onClick={() => onClickBook(book._id)}>{book?.name}</td>
-                  <td className={`${styles.cursor_pointer}`} onClick={() => onClickBook(book._id)}>{book?.isbn}</td>
-                  <td className={`${styles.cursor_pointer}`}>{`${book?.author?.first_name} ${book?.author?.last_name}`}</td>
+                <tr key={author._id}>
+                  <td className={`${styles.cursor_pointer}`} >{author?.first_name}</td>
+                  <td className={`${styles.cursor_pointer}`} >{author?.last_name}</td>
                   <td style={{ width: 100 }}>
                     <div className={[styles.flex_row_center, styles.cursor_pointer, styles.w_100].join(' ')}>
                       <div className={[styles.delete_icon].join(' ')} >
-                        <CreateIcon className={[styles.primary_color, styles.f_18, styles.cursor_pointer].join(' ')} onClick={() => onClickUpdate(book)} />
+                        <CreateIcon className={[styles.primary_color, styles.f_18, styles.cursor_pointer].join(' ')} onClick={() => onClickUpdate(author)} />
                       </div>
                     </div>
                   </td>
-
                 </tr>)
             })
           }
@@ -118,7 +103,7 @@ export default function Books() {
         />
         <ModalComp
           openModal={openModal}
-          title={modalType === 'add' ? "Add Book" : "Update Book"}
+          title={modalType === 'add' ? "Add Author" : "Update Author"}
           onClose={onCloseModal}
           onCancel={onCloseModal}
           showBtns={true}
@@ -127,47 +112,32 @@ export default function Books() {
           <div className={styles.w_100}>
             <div className={styles.modalCn}>
               <div>
-                <div>Book Name</div>
+                <div>Author First Name</div>
                 <InputBase
-                  value={bookName}
-                  onChange={(e) => setBookName(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   inputProps={{
                     'aria-label': 'naked',
                     "data-testid": "company_description"
                   }}
                   label="Outlined"
-                  placeholder='Book name'
+                  placeholder='Author First Name'
                   className={styles.textArea}
                 />
               </div>
               <div>
-                <div>Book ISBN</div>
+                <div>Author Last Name</div>
                 <InputBase
-                  value={bookISBN}
-                  onChange={(e) => setBookISBN(e.target.value)}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   inputProps={{
                     'aria-label': 'naked',
                     "data-testid": "company_description"
                   }}
                   label="Outlined"
-                  placeholder='Book ISBN'
+                  placeholder='Author Last Name'
                   className={styles.textArea}
                 />
-              </div>
-              <div>
-                <div>Book Author</div>
-                <div className={styles.dropDown}>
-                  <DropDownValue
-                    id='first_name'
-                    placeholder={'Select Author'}
-                    options={authors}
-                    value={`${bookAuthor?.first_name} ${bookAuthor?.last_name}`}
-                    setCB={(value) => {
-                      console.log('value', value)
-                      setBookAuthor(value)
-                    }}
-                  />
-                </div>
               </div>
             </div>
           </div>
