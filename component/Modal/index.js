@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './style.module.scss'
 import PropTypes from 'prop-types'
 import Modal from '@material-ui/core/Modal';
-import { _d } from '@/services/storageData';
 
 export default function ModalComp({
   onSave = () => { },
@@ -12,8 +11,8 @@ export default function ModalComp({
   onClose,
   title,
   className,
-  cancelTitle = _d('form.cancel'),
-  saveTitle = _d('form.save'),
+  cancelTitle = 'cancel',
+  saveTitle = 'save',
   showCancelBtn = true,
   showSaveBtn = true,
   showBtns = true,
